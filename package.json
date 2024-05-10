@@ -1,0 +1,40 @@
+{
+  "name": "selenium-nodejs-boilerplate",
+  "version": "1.0.0",
+  "description": "selenium for nodejs, boilerplate code",
+  "packageManager": "yarn@4.0.2",
+  "workspaces": [],
+  "main": "index.js",
+  "dependencies": {
+    "@types/pg": "^8.10.9",
+    "axios": "^1.6.7",
+    "axios-mock-adapter": "^1.22.0",
+    "fs": "^0.0.1-security",
+    "log4js": "^6.9.1",
+    "pg": "^8.11.3",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "selenium-download": "^2.0.16",
+    "selenium-webdriver": "^4.0.0-alpha.7",
+    "webpack-plugin-vuetify": "^3.0.1",
+    "util": "^0.11.1"
+  },
+  "devDependencies": {
+    "eslint": "8.56.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-google": "^0.12.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0",
+    "selenium-webdriver": "^4.0.0-alpha.1",
+    "typescript": "5.3.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "tutttuwi",
+  "license": "MIT"
+
+}

@@ -1,0 +1,43 @@
+{
+  "exclude": [],
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/types/.d.ts",
+    // テンプレート側設定
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "compilerOptions": {
+    "module": "ESNext",
+    "ignoreDeprecations": "5.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "allowJs": true,
+
+    // テンプレート側設定 ===================
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    // "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve"
+
+    /* Linting */ // berry-free-cuetify-vuejs-admin-template側で未利用変数などがあるため一時的にlint設定外す
+    // "strict": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true
+    // テンプレート側設定 ===================
+  }
+
+}
