@@ -39,8 +39,8 @@ const chrome = require("selenium-webdriver/chrome");
 const logger = require("./logger");
 
 // DB接続必要な場合
-const { Pgdao } = require("./db/pgdao");
-const dao = new Pgdao();
+// const { Pgdao } = require("./db/pgdao");
+// const dao = new Pgdao();
 
 // HTTP通信が必要な場合
 // const axios = require('axios');
@@ -79,6 +79,7 @@ let OUTPUT_JSON = {};
 let OUTPUT_JSON_ARRAY = [];
 let options = new chrome.Options();
 options.setBrowserVersion("stable");
+// options.headless();
 options.windowSize({ width: 1980, height: 1200 });
 options.setPageLoadStrategy("normal");
 options.addArguments("--no-sandbox");
@@ -134,25 +135,27 @@ async function procScraping(url: string) {
 }
 
 async function main() {
+  logger.log("[START] main()");
   logger.info("引数:", argv);
 
-  for (let index = 0; index < [].length; index++) {
-    try {
-      await procScraping("https://google.com");
-    } catch (e) {
-      logger.error("xxxエラー発生", JSON.stringify(["something infomation.."]));
-      // @ts-ignore
-      logger.error(e.stack);
-      continue;
-    }
-  }
+  // for (let index = 0; index < [].length; index++) {
+  //   try {
+  await procScraping("https://google.com");
+  //   } catch (e) {
+  //     logger.error("xxxエラー発生", JSON.stringify(["something infomation.."]));
+  //     // @ts-ignore
+  //     logger.error(e.stack);
+  //     continue;
+  //   }
+  // }
   // MEMO: 明示的に必要な場合コメント外す 非同期で流れるため、明示的に落とすとログが一部ロストする可能性あり
   // process.exit(0); // nodejsのプロセスを落とす
+  logger.log("[END] main()");
 }
 
-process.on("exit", () => {
-  process.exit(0);
-});
+// process.on("exit", () => {
+//   process.exit(0);
+// });
 
 /**------------------------------
  *          関数領域
