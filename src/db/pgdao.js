@@ -5,10 +5,9 @@
 /**
  * @typedef {../node_modules/} db
  */
-const { Client } = require('pg');
+const { Client } = require("pg");
 
 const logger = require("../logger");
-
 
 /**
  * @typedef {../node_modules/@types/pg/index} client
@@ -17,10 +16,10 @@ let client;
 class Pgdao {
   constructor() {
     client = new Client({
-      user: 'root',
-      host: 'localhost',
-      database: 'postgres',
-      password: 'glT7nLWjpswADcrv6Sin8gGz',
+      user: "root",
+      host: "localhost",
+      database: "postgres",
+      password: "password",
       port: 15432
     });
 
@@ -28,14 +27,14 @@ class Pgdao {
 
     // initialize();
   }
-  initialize = async function () {
+  initialize = async function() {
     // 初期化処理
-  }
+  };
 
-  insertBuildingData = async function (data) {
-
+  insertBuildingData = async function(data) {
     const query = {
-      text: 'INSERT INTO building( \
+      text:
+        "INSERT INTO building( \
         url \
         ,building_name \
         ,nearest_station \
@@ -45,54 +44,63 @@ class Pgdao {
         ,created_user \
         ,updated_dt \
         ,updated_user) \
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-      values: [data.buildingUrl, data.buildingName, data.buildingNs, new Date(data.buildingYoc), null, new Date(), 'SYSTEM_USER', new Date(), 'SYSTEM_USER']
-    }
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+      values: [
+        data.buildingUrl,
+        data.buildingName,
+        data.buildingNs,
+        new Date(data.buildingYoc),
+        null,
+        new Date(),
+        "SYSTEM_USER",
+        new Date(),
+        "SYSTEM_USER"
+      ]
+    };
     const result = await client.query(query);
     // logger.info("建物情報登録：", JSON.stringify(result));
     return result;
-  }
-  getBuildingData = async function (url) {
+  };
+  getBuildingData = async function(url) {
     // logger.info("getBuildingData START", url)
     const query = {
-      text: 'SELECT * FROM building WHERE url = $1',
-      values: [url],
-    }
+      text: "SELECT * FROM building WHERE url = $1",
+      values: [url]
+    };
 
     const result = await client.query(query);
     // logger.info("建物情報取得：", JSON.stringify(result.rows));
     // logger.info("getBuildingData END")
     return result.rows;
-  }
+  };
 
-  countPropData = async function (data) {
+  countPropData = async function(data) {
     const query = {
-      text: 'SELECT COUNT(*) FROM prop WHERE url = $1',
-      values: [
-        data.url
-      ]
-    }
+      text: "SELECT COUNT(*) FROM prop WHERE url = $1",
+      values: [data.url]
+    };
 
     const result = await client.query(query);
     // console.log("物件情報件数取得：", result);
     return result.rowCount;
-  }
+  };
 
-  insertPropData = async function (data) {
+  insertPropData = async function(data) {
     // 枝番採番
     const currentBranchRow = await client.query({
       // text: 'SELECT branch + 1 FROM prop WHERE url = $1',
-      text: 'SELECT MAX(branch) as latest FROM prop WHERE url = $1',
+      text: "SELECT MAX(branch) as latest FROM prop WHERE url = $1",
       values: [data.url]
-    })
+    });
     // logger.info("currentBranchRow", JSON.stringify(currentBranchRow));
     // const nextBranch = nextBranchRow.rows.length === 0 ? 1 : nextBranchRow.rows[0]
-    const nextBranch = !currentBranchRow.rows[0].latest ? 1 : currentBranchRow.rows[0].latest + 1
+    const nextBranch = !currentBranchRow.rows[0].latest ? 1 : currentBranchRow.rows[0].latest + 1;
     // logger.info("data", JSON.stringify(data));
     // logger.info("nextBranch", JSON.stringify(nextBranch));
 
     const query = {
-      text: 'INSERT INTO prop( \
+      text:
+        "INSERT INTO prop( \
         url \
         ,branch \
         ,building_url \
@@ -106,7 +114,7 @@ class Pgdao {
         ,created_user \
         ,updated_dt \
         ,updated_user) \
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
       values: [
         data.url,
         nextBranch, // 取得した次の枝番を設定
@@ -118,11 +126,11 @@ class Pgdao {
         data.direction,
         data.deletedDt,
         new Date(),
-        'SYSTEM_USER',
+        "SYSTEM_USER",
         new Date(),
-        'SYSTEM_USER'
+        "SYSTEM_USER"
       ]
-    }
+    };
     /**
      *       const propInfoRet = {
         propName: await propInfoAnchorEl.getText(),
@@ -142,30 +150,27 @@ class Pgdao {
     const result = await client.query(query);
     // console.log("建物情報登録：", result);
     return result;
-  }
-  deletePropData = async function (data) {
+  };
+  deletePropData = async function(data) {
     const query = {
-      text: 'UPDATE prop SET deleted_dt = ($1), updated_dt = ($2), updated_user = ($3) WHERE url = ($4)',
-      values: [
-        new Date(),
-        new Date(),
-        'SYSTEM_USER',
-        data.url
-      ]
-    }
+      text:
+        "UPDATE prop SET deleted_dt = ($1), updated_dt = ($2), updated_user = ($3) WHERE url = ($4)",
+      values: [new Date(), new Date(), "SYSTEM_USER", data.url]
+    };
 
     // logger.info("物件情報削除クエリ（更新クエリ）：", JSON.stringify(query));
     const result = await client.query(query);
     // logger.info("物件情報削除結果：", JSON.stringify(result));
     return result;
-  }
+  };
 
   /**
    * 建物情報に紐づく物件を削除
    */
-  deletePropDataRelatedBuilding = async function (buildingUrl) {
+  deletePropDataRelatedBuilding = async function(buildingUrl) {
     const query = {
-      text: "\
+      text:
+        "\
       insert into prop(url,branch ,building_url ,building_name ,floor_plan ,prop_price ,ex_area ,direction ,serve_period_info ,deleted_dt ,fetched_prop_info_flg ,created_dt ,created_user ,updated_dt ,updated_user) \
 select                          \
 	p.url,                      \
@@ -192,30 +197,31 @@ where \
 	and p.deleted_dt is null \
       ",
       values: [buildingUrl]
-    }
+    };
 
     // logger.info("物件情報削除クエリ（更新クエリ）：", JSON.stringify(query));
     const result = await client.query(query);
     // logger.info("物件情報削除結果：", JSON.stringify(result));
     return result;
-  }
+  };
 
   /**
    * 建物URLに紐づく最新の物件情報を取得
-   * @param {*} buildinUrl 
-   * @returns 
+   * @param {*} buildinUrl
+   * @returns
    */
-  getPropData = async function (buildinUrl) {
+  getPropData = async function(buildinUrl) {
     // console.log("getPropData START", buildinUrl)
     const query = {
       // text: 'SELECT * FROM prop WHERE building_url = $1',
-      text: 'SELECT a.* FROM prop a \
+      text:
+        "SELECT a.* FROM prop a \
       inner join (select url, MAX(branch) as latest from prop group by url) as b \
       on a.url = b.url and a.branch = b.latest \
       WHERE building_url = $1 and deleted_dt is null \
-      ',
-      values: [buildinUrl],
-    }
+      ",
+      values: [buildinUrl]
+    };
 
     const result = await client.query(query);
     // console.log("物件情報取得：", result.rows);
@@ -224,33 +230,34 @@ where \
     if (result.rows.length) {
       return result.rows.flatMap(row => {
         return {
-          url: row.url
-          , branch: row.branch
-          , buildingUrl: row.building_url
-          , buildingName: row.building_name
-          , floorPlan: row.floor_plan
-          , propPrice: row.prop_price
-          , exArea: row.ex_area
-          , direction: row.direction
-          , servePeriodInfo: row.serve_period_info
-          , deletedDt: row.deleted_dt
-          , createdDt: row.created_dt
-          , createdUser: row.created_user
-          , updatedDt: row.updated_dt
-          , updatedUser: row.updated_user
-        }
-      })
+          url: row.url,
+          branch: row.branch,
+          buildingUrl: row.building_url,
+          buildingName: row.building_name,
+          floorPlan: row.floor_plan,
+          propPrice: row.prop_price,
+          exArea: row.ex_area,
+          direction: row.direction,
+          servePeriodInfo: row.serve_period_info,
+          deletedDt: row.deleted_dt,
+          createdDt: row.created_dt,
+          createdUser: row.created_user,
+          updatedDt: row.updated_dt,
+          updatedUser: row.updated_user
+        };
+      });
     } else {
       return []; // 空配列
     }
     // return result.rows;
-  }
+  };
 
-  findAllPropData = async function () {
+  findAllPropData = async function() {
     // logger.info("findAllPropData START");
     const query = {
       // text: 'SELECT p.url, p.branch FROM prop p LEFT JOIN prop_info pi ON p.url = pi.url AND p.branch = pi.branch WHERE pi.url is null or p.fetched_prop_info_flg = true',
-      text: 'select                                \
+      text:
+        "select                                \
       p.*                            \
     from                                  \
       (                                 \
@@ -276,43 +283,42 @@ where \
       (pi.url is null                   \
         and p.deleted_dt is null)     \
       or p.fetched_prop_info_flg = true \
-    ',
-      values: [],
-    }
+    ",
+      values: []
+    };
     const result = await client.query(query);
 
     if (result.rows.length) {
       return result.rows.flatMap(row => {
         return {
-          url: row.url
-          , branch: row.branch
-          , buildingUrl: row.building_url
-          , buildingName: row.building_name
-          , floorPlan: row.floor_plan
-          , propPrice: row.prop_price
-          , exArea: row.ex_area
-          , direction: row.direction
-          , servePeriodInfo: row.serve_period_info
-          , deletedDt: row.deleted_dt
-          , createdDt: row.created_dt
-          , createdUser: row.created_user
-          , updatedDt: row.updated_dt
-          , updatedUser: row.updated_user
-        }
-      })
+          url: row.url,
+          branch: row.branch,
+          buildingUrl: row.building_url,
+          buildingName: row.building_name,
+          floorPlan: row.floor_plan,
+          propPrice: row.prop_price,
+          exArea: row.ex_area,
+          direction: row.direction,
+          servePeriodInfo: row.serve_period_info,
+          deletedDt: row.deleted_dt,
+          createdDt: row.created_dt,
+          createdUser: row.created_user,
+          updatedDt: row.updated_dt,
+          updatedUser: row.updated_user
+        };
+      });
     } else {
       return []; // 空配列
     }
     // logger.info("対象物件情報取得：", JSON.stringify(result.rows));
     // logger.info("findAllPropData END")
+  };
 
-  }
-
-  insertPropDetailsData = async function (data) {
-
+  insertPropDetailsData = async function(data) {
     // console.log("data", data);
     const query = {
-      text: 'INSERT INTO prop_info_details( \
+      text:
+        "INSERT INTO prop_info_details( \
         url \
         ,branch \
         ,building_name \
@@ -323,7 +329,7 @@ where \
         ,created_user \
         ,updated_dt \
         ,updated_user) \
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
       values: [
         data.url,
         data.branch,
@@ -332,11 +338,11 @@ where \
         data.itemName,
         data.itemValue,
         new Date(),
-        'SYSTEM_USER',
+        "SYSTEM_USER",
         new Date(),
-        'SYSTEM_USER'
+        "SYSTEM_USER"
       ]
-    }
+    };
 
     /**
      *       const propInfoRet = {
@@ -356,13 +362,13 @@ where \
     const result = await client.query(query);
     // logger.info("物件情報登録：", JSON.stringify(result));
     return result;
-  }
+  };
 
-  insertPropInfo = async function (data) {
-
+  insertPropInfo = async function(data) {
     // logger.info("prop_info insert data: ", JSON.stringify(data));
     const query = {
-      text: 'INSERT INTO public.prop_info          \
+      text:
+        'INSERT INTO public.prop_info          \
       (url,                                 \
        branch,                              \
        prop_name,                           \
@@ -552,79 +558,76 @@ where \
         data.relatedLinks,
         data.parkingSpaces,
         new Date(),
-        'SYSTEM_USER',
+        "SYSTEM_USER",
         new Date(),
-        'SYSTEM_USER'
+        "SYSTEM_USER"
       ]
-    }
+    };
     const result = await client.query(query);
     // logger.info("物件情報登録：", JSON.stringify(result));
     return result;
-  }
+  };
 
-  deleteBuildingData = async function (data) {
+  deleteBuildingData = async function(data) {
     const query = {
-      text: 'UPDATE building SET deleted_dt = $1, updated_dt = $2, updated_user = $3 WHERE url = $4',
-      values: [
-        new Date(),
-        new Date(),
-        'SYSTEM_USER',
-        data.url
-      ]
-    }
+      text:
+        "UPDATE building SET deleted_dt = $1, updated_dt = $2, updated_user = $3 WHERE url = $4",
+      values: [new Date(), new Date(), "SYSTEM_USER", data.url]
+    };
     const result = await client.query(query);
     // logger.info("建物情報削除：", JSON.stringify(result));
     return result;
-  }
+  };
 
-  getAreaMst = async function (data) {
+  getAreaMst = async function(data) {
     const query = {
-      text: 'SELECT prefecture, area_name, url FROM area_mst',
+      text: "SELECT prefecture, area_name, url FROM area_mst",
       values: []
-    }
+    };
     const result = await client.query(query);
     // logger.info("対象エリア", JSON.stringify(result.rows));
     return result.rows;
-  }
+  };
 
-  getAreaMstById = async function (id) {
+  getAreaMstById = async function(id) {
     const query = {
-      text: 'SELECT prefecture, area_name, url FROM area_mst where seq = $1',
+      text: "SELECT prefecture, area_name, url FROM area_mst where seq = $1",
       values: [id]
-    }
+    };
     const result = await client.query(query);
     // logger.info("対象エリア", JSON.stringify(result.rows));
     return result.rows;
-  }
+  };
 
-  findFavBuildingInfo = async function () {
+  findFavBuildingInfo = async function() {
     const query = {
-      text: 'SELECT b.* FROM building_fav as bf inner join building as b on bf.url = b.url',
+      text: "SELECT b.* FROM building_fav as bf inner join building as b on bf.url = b.url",
       values: []
-    }
+    };
     const result = await client.query(query);
     if (result.rows.length) {
       return result.rows.flatMap(row => {
         return {
-          url: row.url
-          , buildingName: row.building_name
-          , nearestStation: row.nearest_station
-          , yearOfConstruction: row.year_of_construction
-          , deletedDt: row.deleted_dt
-          , createdDt: row.created_dt
-          , createdUser: row.created_user
-          , updatedDt: row.updated_dt
-          , updatedUser: row.updated_user
-        }
-      })
+          url: row.url,
+          buildingName: row.building_name,
+          nearestStation: row.nearest_station,
+          yearOfConstruction: row.year_of_construction,
+          deletedDt: row.deleted_dt,
+          createdDt: row.created_dt,
+          createdUser: row.created_user,
+          updatedDt: row.updated_dt,
+          updatedUser: row.updated_user
+        };
+      });
     } else {
       return []; // 空配列
     }
-  }
+  };
 
-  findUpdatedPropInfoList = async function (buildingInfo) {
+  findUpdatedPropInfoList = async function(buildingInfo) {
     const query = {
-      text: "with MULTI_ROW as (                                                                                                                                    \
+      text:
+        "with MULTI_ROW as (                                                                                                                                    \
         select * from prop p1 where exists(                                                                                                                    \
         select p.url,count(*) as cnt from prop p where p1.url = p.url group by p.url having count(*) > 1                                                       \
         ) order by url,branch                                                                                                                                  \
@@ -640,30 +643,28 @@ where \
         where p.building_url = $1 and p.created_dt >= current_date                                                                                            \
         order by r.url, r.branch                                                                                                                               ",
       values: [buildingInfo.url]
-    }
+    };
     const result = await client.query(query);
-    logger.info("result",result);
+    logger.info("result", result);
     if (result.rows.length) {
       return result.rows.flatMap(row => {
         return {
-          url: row.url
-          , branch: row.branch
-          , propPrice: row.prop_price
-          , deletedDt: row.deleted_dt
-          , priceDiff: row.price_diff
-          , isChangeDeleted: row.is_change_deleted
-          , isSameUrl: row.is_same_url
-          , exArea: row.ex_area
-          , floorPlan: row.floor_plan
-          , createdDt: row.created_dt
-        }
-      })
+          url: row.url,
+          branch: row.branch,
+          propPrice: row.prop_price,
+          deletedDt: row.deleted_dt,
+          priceDiff: row.price_diff,
+          isChangeDeleted: row.is_change_deleted,
+          isSameUrl: row.is_same_url,
+          exArea: row.ex_area,
+          floorPlan: row.floor_plan,
+          createdDt: row.created_dt
+        };
+      });
     } else {
       return []; // 空配列
     }
-  }
-
-
+  };
 }
 
 module.exports = { Pgdao };
